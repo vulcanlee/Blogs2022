@@ -1,4 +1,4 @@
-# 在 .NET 程式中，如何讀取到未攔截到例外異常 Exception 發生的時候，當時的詳細狀況
+# C# 非同步 : 在 .NET 程式中，如何讀取到未攔截到例外異常 Exception 發生的時候，當時的詳細狀況
 
 當 .NET 處理程序在執行過程中，產生無法捕捉到的例外異常情況，將會造成該應用程式崩潰，此時，透過 AppDomain 物件內所提供的 UnhandledException 事件 ([AppDomain.UnhandledException 事件](https://docs.microsoft.com/zh-tw/dotnet/api/system.appdomain.unhandledexception?WT.mc_id=DT-MVP-5002220))，將會於該處理程序要結束執行前幾秒，觸發與執行這裡所綁定的委派事件方法，因此，程式設計師可以在這裡進行任何的紀錄或者補救措施，不過，很重要的是，只有短短的幾秒鐘的時間可以來執行。
 

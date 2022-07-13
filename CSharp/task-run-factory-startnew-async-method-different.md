@@ -1,4 +1,4 @@
-# Task.Run 與 Task.Factory.StartNew 傳入一個 async 非同步委派方法的運作差異
+# C# 非同步 : Task.Run 與 Task.Factory.StartNew 傳入一個 async 非同步委派方法的運作差異
 
 我們知道在 .NET Framework 4.0 的時候，微軟推出了 [TPL (Task Parallel Library) 工作平行程式庫](https://docs.microsoft.com/zh-tw/dotnet/standard/parallel-programming/task-parallel-library-tpl?WT.mc_id=DT-MVP-5002220) ， 而 TPL 存在的目的是透過 .NET Framework 提供的一組 API，並且將這些 API 組合在一個類別庫內，進而簡化平行處理程式設計的方法與設計流程，讓開發人員更有生產力與可以輕鬆地開發出平行、並行、非同步應用的應用程式。
 
