@@ -152,11 +152,17 @@ System.InvalidOperationException: Collection was modified; enumeration operation
 
 現在將 `#region 執行緒 2 ... #endregion` 內的敘述註解起來，並且將 `#region 執行緒 3 ... #endregion` 內的所有程式碼解除註解
 
+底下的螢幕截圖，將會是執行結果
 
+整體執行過程中沒有發生拋出例外異常的問題
 
+![](../Images/net964.png)
 
+## 分析
 
+關於之前提到的例外異常，可以使用底下的程式碼再度來進行測試
 
+這裡將會產生 100 個項目 Item 到 `List<string>` 中，此時，將會在另外一個執行緒內，使用 foreach 敘述，每隔 0.5 秒鐘來讀取一個項目出來，若使用者沒有按下任何一個按鍵，則一切相安無事，可是，只要使用者按下任何一個按鍵，將會導致在主執行緒內，開始再度新增 100 個項目到集合物件 List 內，現在，將會得到同樣的 Collection was modified; enumeration operation may not execute 例外異常訊息，這樣有比較清楚造成這個例外異常的發生原因了吧
 
 ```csharp
 namespace ConsoleApp6
@@ -194,3 +200,29 @@ namespace ConsoleApp6
     }
 }
 ```
+
+還有一個問題那就是，雖然取消了執行緒2的執行，改採執行緒3，並且執行結果似乎沒有看到問題，現在來看看執行緒3的程式碼有那些問題
+
+```csharp
+#region 執行緒 3
+new Thread(() =>
+{
+    while (true)
+        for (int i = 0; i < list.Count; i++)
+        { var b = list[i]; Write("R"); }
+    list.Clear();
+    Write("C");
+})
+{ IsBackground = true }.Start();
+#endregion
+```
+
+在執行緒3的委派方法內存在一個很大的問題，那就是若有這樣的時機發生，執行到 `list.Clear();` 敘述，將會導致集合物件內的整個項目都會清空，可是，當在執行這個動作的同時，執行緒1同時也有新增項目到集合物件內，極有可能會造成這個項目尚未被執行緒3處理，就直接被清除掉了，若發生這樣的問題，將會是很難除錯的，因為，使用者或者身為開發者的你，也無法有效地重現出當時發生問題情況，問題是很難抓出來的。
+
+這樣的多執行緒程式碼將會造成一個現象，那就是這個程式碼不具備 [執行緒安全 Thread Safety] 特性，因為，在多執行緒環境執行下，這組程式的執行結果將會是不可預期的。
+
+最簡單的解法那就是當要寫入或者刪除共用資源，這裡將會是 list 這個集合物件，要進行鎖定的動作，因此，當執行 `list.Clear();` 敘述的時候，要確保其他執行緒是不能夠來進行寫入動作的，當然，加入的鎖定或者其他同步機制，將會造成執行效能有所損失。
+
+因此，只要是在多執行緒程式下，對於要存取共用的集合物件，可以參考這篇文章 [安全執行緒集合](https://docs.microsoft.com/zh-tw/dotnet/standard/collections/thread-safe?WT.mc_id=DT-MVP-5002220)。在這篇文章中，開宗明義提到了：.NET Framework 4 引進了 System.Collections.Concurrent 命名空間，其中包含數個兼具安全執行緒與調整能力的集合類別。因此，建議還是採用這樣的類別來進行多執行緒下的集合物件存取。
+
+對於這裡提到的應用，可以先參考微軟建議的 [如何：實作生產者-取用者資料流程模式](https://docs.microsoft.com/zh-tw/dotnet/standard/parallel-programming/how-to-implement-a-producer-consumer-dataflow-pattern?WT.mc_id=DT-MVP-5002220) 做法，或者可以在網路上搜尋其他人寫好的類似套件，直接使用這些套件來進行多執行程式設計，因為這些套件是具有執行緒安全的特性，所以，透過使用這些套件或者微軟建議的做法，你開發出來的程式碼，也會是具有執行緒安全的特性的。
