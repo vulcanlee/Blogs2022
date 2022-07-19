@@ -124,3 +124,13 @@ Unhandled exception. System.ArgumentOutOfRangeException: capacity was less than 
 ```
 
 看到上述的說明，強烈建議開發者，若要進行多執行緒程式設計，要存取共用資源，選擇具有執行緒安全的型別；對於 .NET API 文件或者其他第三方套件，也要特別來查看，對於靜態成員或者執行個體成員，是否具有執行緒安全的特性，若沒有，就要考慮使用 [同步處理原始物件概觀](https://docs.microsoft.com/zh-tw/dotnet/standard/threading/overview-of-synchronization-primitives?WT.mc_id=DT-MVP-5002220) 其中一種機制來保護共用資源的存取行為。
+
+針對上面的程式碼，想要完成一個具有執行緒安全的程式碼，選擇一個提供執行緒安全的類別與API，在這裡將會把原先的 `static List<int> ints = new List<int>();` 敘述，修改成為這樣的宣告 `static ConcurrentBag<int> ints = new ConcurrentBag<int>();` ，而其他的程式碼都不用修正，就完成了
+
+這裡使用的 [ConcurrentBag<T> Class](https://docs.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentbag-1?WT.mc_id=DT-MVP-5002220) 這個類別，這裡是官方的說明：代表安全執行緒的未排序物件集合
+
+其中對於執行緒安全的介紹如下
+
+> ## 執行緒安全性
+>
+> 所有公用和受保護的成員 ConcurrentBag<T> 都是安全線程，而且可以從多個執行緒同時使用。 不過，透過實作的其中一個介面 ConcurrentBag<T> 存取成員，包括擴充方法，不保證為安全線程，而且可能必須由呼叫端同步處理。
