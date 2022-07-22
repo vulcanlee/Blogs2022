@@ -123,8 +123,124 @@ internal static class PrismStartup
 
 在這裡將會看到 Prism 在這個專案中的設定程式碼，首先，對於 DI / IoC Container 相依性注入容器，並不是使用微軟內建的原件，而是 Prism 自己的，因此，想要注入的相關服務，要在這裡來進行註冊，當然，要使用到的頁面，也需要在這裡來宣告。
 
+打開 [App.xaml] 與 [App.xaml.cs] 檔案，看到的是很清爽的內容
 
+```xml
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:PrismApp1"
+             x:Class="MyFirstPrismMaui.App">
+  <Application.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
+        <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>
+```
 
+```csharp
+namespace MyFirstPrismMaui;
+
+public partial class App : Application
+{
+    public App()
+    {
+        InitializeComponent();
+    }
+}
+```
+
+現在來看看第一個頁面，[Views] 資料夾 > [MainPage.xaml] 檔案，請打開這個檔案，其內容如下
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="{Binding Title}"
+             x:Class="MyFirstPrismMaui.Views.MainPage">
+
+  <ScrollView>
+    <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+      <Image Source="prism.png"
+             SemanticProperties.Description="Cute dot net bot waving hi to you!"
+             HeightRequest="150"
+             HorizontalOptions="Center" />
+
+      <Label Text="Hello, World!"
+             SemanticProperties.HeadingLevel="Level1"
+             FontSize="32"
+             HorizontalOptions="Center" />
+
+      <Label Text="Welcome to Prism for .NET MAUI"
+             SemanticProperties.HeadingLevel="Level2"
+             SemanticProperties.Description="Welcome to Prism for dot net Multi platform App U I"
+             FontSize="18"
+             HorizontalOptions="Center" />
+
+      <Button Text="{Binding Text}"
+              SemanticProperties.Hint="Counts the number of times you click"
+              Command="{Binding CountCommand}"
+              HorizontalOptions="Center" />
+
+    </VerticalStackLayout>
+  </ScrollView>
+
+</ContentPage>
+```
+
+這個頁面是個相當簡單的 XAML 頁面，現在要來看看 ViewModel 的內容，是否有甚麼變化。
+
+打開 [ViewModels] 資料夾 > [MainPageViewModel.cs] 檔案，其內容如下
+
+```csharp
+namespace MyFirstPrismMaui.ViewModels;
+
+public class MainPageViewModel : BindableBase
+{
+    private ISemanticScreenReader _screenReader { get; }
+    private int _count;
+
+    public MainPageViewModel(ISemanticScreenReader screenReader)
+    {
+        _screenReader = screenReader;
+        CountCommand = new DelegateCommand(OnCountCommandExecuted);
+    }
+
+    public string Title => "Main Page";
+
+    private string _text = "Click me";
+    public string Text
+    {
+        get => _text;
+        set => SetProperty(ref _text, value);
+    }
+
+    public DelegateCommand CountCommand { get; }
+
+    private void OnCountCommandExecuted()
+    {
+        _count++;
+        if (_count == 1)
+            Text = "Clicked 1 time";
+        else if (_count > 1)
+            Text = $"Clicked {_count} times";
+
+        _screenReader.Announce(Text);
+    }
+}
+```
+
+這裡還是與 Xamarin.Forms 時期的時候，用法都相同，在這裡繼承了 [BindableBase] 這個類別，接著就可以方便使用資料綁定的功能了
+
+只不過，看到建構式內，注入了 [ISemanticScreenReader] 介面實作物件，說實在的，我還不知道這是甚麼服務功能，因此，我在 [OnCountCommandExecuted] 命令委派方法內，將 `_screenReader.Announce(Text);` 敘述註解起來，結果執行後，與沒有結果的似乎沒有差異，等到日後理解這個介面的用法後，會再寫篇文章來說明。
 
 點選中間上方工具列的 [Windows Machine] 這個工具列按鈕旁的下拉選單三角形
 
@@ -135,4 +251,6 @@ internal static class PrismStartup
 底下是執行後的結果
 
 ![](../Images/net960.png)
+
+現在嘗試建立一個新的頁面
 
