@@ -2,7 +2,7 @@
 
 若對於這些課程有興趣，或者想要企業內訊者，可以在此留言，或者到 [Xamarin Blazor 實驗室](https://www.facebook.com/vulcanlabtw) 粉絲團來私訊給我
 
-## 初探 .NET 平行程式設計
+## 初探 .NET 平行程式設計 (非同步程式設計系列 之 1 / 6)
 
 這年頭手機都多核心了我們寫的程式還跑在單核上嗎？
 
@@ -38,11 +38,13 @@
 
 參考網址 : [https://skilltree.my/Events/2022/1/9/Parallel-programming-in-dotnet-for-beginners-Batch-2](https://skilltree.my/Events/2022/1/9/Parallel-programming-in-dotnet-for-beginners-Batch-2)
 
-## 由 Parallel.For 來看多執行緒程式設計
+## 由 Parallel.For 來看多執行緒程式設計 (非同步程式設計系列 之 2 / 6)
 
 在多執行緒程式設計領域中，有 TPL , ThreadPool , Parallel.For , PLINQ 等等技術，其目的在降低使用複雜度，提供高階程式設計模型，開發者可以很容易地使用這些功能。但坊間流竄許多種各式各樣的奇技淫巧，有些是聽從前輩的建議，有些是自身特定情境中的經驗，這些招式與看法不能說錯，但總是片片斷斷無法有系統的理解背後的原理與限制，所以 SkillTree 舉辦了本活動針對 Parallel.For 做深入的探討，藉由因循漸進的案例讓您充分了解這技術的奧妙。
 
 本課程是平行程式設計的初階，不是程式學習的初階，您必須具備 C# 開發經驗、了解泛型與委派的使用方式，並且具備基本電腦架構運作知識。
+
+本課程的緣由來自臉書討論版上的一連長串討論內容，有興趣的人可以查看 [討論串列](https://vulcanfiles.blob.core.windows.net/$web/Share/2022/Multi-Thread-Parallel-For.png) 螢幕截圖，若你對於這片串列上所提出的問題，或者有人提出的解答，存在著疑問或者更多的問題，那麼，你一定要來報名參加這個課程，因為，你所有的問題都可以從這個課程中獲得解答。
 
 ### 課程大綱
 
@@ -66,7 +68,7 @@
 
 參考網址 : [https://skilltree.my/Events/2022/1/16/NET-CSharp-Parallel-Programming-Batch-2](https://skilltree.my/Events/2022/1/16/NET-CSharp-Parallel-Programming-Batch-2)
 
-## 精準解析 .NET Thread 執行緒
+## 精準解析 .NET Thread 執行緒 (非同步程式設計系列 之 3 / 6)
 
 在 .NET 要建立一個執行緒，將需要指定一個委派方法，而一個執行緒 Thread 代表一個正在同步執行程式碼，若想要同時執行多個委派方法，則需要建立多個執行緒，而一台電腦能夠同時處理執行緒的數量，將會取決於這台電腦上的 CPU 的能力。
 
@@ -103,7 +105,7 @@
 
 參考網址 : [https://skilltree.my/Events/2022/7/17/analyzing-dot-net-thread](https://skilltree.my/Events/2022/7/17/analyzing-dot-net-thread)
 
-## 精準解析 .NET Task 工作
+## 精準解析 .NET Task 工作 (非同步程式設計系列 之 4 / 6)
 
 以往想要進行平行或非同步程式設計(平行計算是一種非同步計算，前者屬於透過 CPU 來做到同時執行的需求，後者大多表示要進行 I/O 或者網路呼叫的時候，所要進行的處理作業)，往往需要透過多執行緒來完成，可是要能夠充分駕馭執行緒來完成上述設計需求，對於絕大多數的程式設計師而言，將不是一件簡單的工作；有鑑於此，微軟在 .NET Framework 4.0 之後，推出了 工作平行類別庫 Task Parallel Library (TPL)，而在 .NET BCL 中的許多 API，也都改寫成為使用了 TAP 以工作為基礎的非同步模式 Task-based Asynchronous Pattern 的 API，取代以往 APM 與 EAP 的程式設計做法；這樣的改變將會讓 C# 程式設計師可以享受到許多 TPL 類別庫所帶來好處。
 
@@ -140,6 +142,32 @@
 此課程為 Skill Tree 專屬課程，想要參加者，請隨時注意 Skill Tree 的最新公告
 
 參考網址 : [https://skilltree.my/Events/2022/7/10/analyzing-dot-net-task](https://skilltree.my/Events/2022/7/10/analyzing-dot-net-task)
+
+## 精通與使用 async 與 await (非同步程式設計系列 之 5 / 6)
+
+正在開發中
+
+### 課程大綱
+
+正在開發中
+
+### 等級 
+
+高階
+
+### 需求
+
+* 具備 C# 程式語言開發經驗
+* 具有 委派 Delegate 的知識與使用技術
+* 了解 平行、並行、同步、非同步等知識
+* 具有 Thread 執行緒類別使用與程式設計經驗
+* 具有使用 TPL Task 工作類別的使用與程式設計經驗
+
+### 想要參加
+
+此課程為 Skill Tree 專屬課程，想要參加者，請隨時注意 Skill Tree 的最新公告
+
+正在開發中
 
 ## Blazor 全端開發，新手村一日脫逃術
 
