@@ -1,4 +1,4 @@
-# 資料綁定 Data Binding 的自行建置 INotifyPropertyChanged 介面
+# 資料綁定 Data Binding - 1 自行建置 INotifyPropertyChanged 介面
 
 當在學習 毛伊 MAUI 跨平台開發工具來進行 Android , iOS , WinUI 等平台應用程式開發的時候，對於 MVVM Model View ViewModel 這樣的設計模式一定十分孰悉與精通 ，而在 MVVM 設計模式下的 資料綁定 Data Binding 觀念與實作技術，也務必要徹底了解，這樣的技術是怎麼運行起來的，可以提供甚麼樣的好處。
 
