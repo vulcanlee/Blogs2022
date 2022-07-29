@@ -4,6 +4,18 @@
 
 在這篇文章中將會使用另外一個做法，可以把整個專案程式碼變得更加精簡，且具有相同的效果，那就是使用 [Fody/PropertyChanged](https://github.com/Fody/PropertyChanged) 套件，因為這個套件將會提供自動注入相關 PropertyChanged 事件會用到的程式碼，並且適時觸發這個屬性異動的通知事件到屬性內的 set 存取子內，唯一要做的就是這個類別要實作 INotifyPropertyChanged 介面即可，其他的程式碼將會由 PropertyChanged.Fody 幫你來完成。
 
+## 系列文章清單
+
+[1 自行建置 INotifyPropertyChanged 介面](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-implementation-INotifyPropertyChanged-PropertyChanged.html)
+
+[2 設計基底類別，透過繼承可以使用屬性變更通知](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-base-class-BindableBase-PropertyChanged.html)
+
+[3 PropertyChanged.Fody 套件，大幅簡化屬性變更通知程式設計碼](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-nuget-propertychanged-fody-il-reduce-auto-property-impletation.html)
+
+[4 CommunityToolkit.Mvvm 套件，透過原始碼產生來簡化屬性變更通知程式設計碼](https://csharpkh.blogspot.com/2022/08/maui-mvvm-data-binding-nuget-CommunityToolkit-Mvvm-source-generator-ObservableObject-RelayCommand.html)
+
+[5 在 Maui 專案內，如何得知 ViewModel 內的屬性產生異動，而 View 可以收到通知呢？](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-CommunityToolkit-detect-ViewModel-View-Event-PropertyChanged-Event.html)
+
 ## 建立新專案
 
 * 開啟 Visual Studio 2022 開發工具

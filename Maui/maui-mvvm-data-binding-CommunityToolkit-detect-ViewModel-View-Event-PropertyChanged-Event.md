@@ -2,6 +2,17 @@
 
 在最後對於資料綁定 Data Binding 的 INotifyPropertyChanged 的用法，將會回到 MAUI 專案內來實際觀察，在這篇文章中，將會使用 CommunityToolkit.Mvvm 這個套件來進行檢測
 
+## 系列文章清單
+
+[1 自行建置 INotifyPropertyChanged 介面](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-implementation-INotifyPropertyChanged-PropertyChanged.html)
+
+[2 設計基底類別，透過繼承可以使用屬性變更通知](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-base-class-BindableBase-PropertyChanged.html)
+
+[3 PropertyChanged.Fody 套件，大幅簡化屬性變更通知程式設計碼](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-nuget-propertychanged-fody-il-reduce-auto-property-impletation.html)
+
+[4 CommunityToolkit.Mvvm 套件，透過原始碼產生來簡化屬性變更通知程式設計碼](https://csharpkh.blogspot.com/2022/08/maui-mvvm-data-binding-nuget-CommunityToolkit-Mvvm-source-generator-ObservableObject-RelayCommand.html)
+
+[5 在 Maui 專案內，如何得知 ViewModel 內的屬性產生異動，而 View 可以收到通知呢？](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-CommunityToolkit-detect-ViewModel-View-Event-PropertyChanged-Event.html)
 
 ## 建立新專案
 
