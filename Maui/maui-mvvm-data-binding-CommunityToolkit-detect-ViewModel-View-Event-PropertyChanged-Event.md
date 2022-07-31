@@ -2,7 +2,6 @@
 
 在最後對於資料綁定 Data Binding 的 INotifyPropertyChanged 的用法，將會回到 MAUI 專案內來實際觀察，在這篇文章中，將會使用 CommunityToolkit.Mvvm 這個套件來進行檢測
 
-
 ## 建立新專案
 
 * 開啟 Visual Studio 2022 Preview 開發工具
