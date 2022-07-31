@@ -6,6 +6,18 @@
 
 從上述的描述可以看出，這樣將會大量使用到 剪貼 技能來進行程式碼的設計，這樣的設計將會是得未來程式碼變得不好維護，因為，在這裡可以選擇使用物件導向程式設計技能，將這些共通的程式碼，設計到一個基底類別 Base Class 內，下次要設計一個新的類別，並且想要提供屬性變更通知這樣機制的時候，便可以繼承這個基底類別即可。
 
+## 系列文章清單
+
+[1 自行建置 INotifyPropertyChanged 介面](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-implementation-INotifyPropertyChanged-PropertyChanged.html)
+
+[2 設計基底類別，透過繼承可以使用屬性變更通知](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-base-class-BindableBase-PropertyChanged.html)
+
+[3 PropertyChanged.Fody 套件，大幅簡化屬性變更通知程式設計碼](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-nuget-propertychanged-fody-il-reduce-auto-property-impletation.html)
+
+[4 CommunityToolkit.Mvvm 套件，透過原始碼產生來簡化屬性變更通知程式設計碼](https://csharpkh.blogspot.com/2022/08/maui-mvvm-data-binding-nuget-CommunityToolkit-Mvvm-source-generator-ObservableObject-RelayCommand.html)
+
+[5 在 Maui 專案內，如何得知 ViewModel 內的屬性產生異動，而 View 可以收到通知呢？](https://csharpkh.blogspot.com/2022/07/maui-mvvm-data-binding-CommunityToolkit-detect-ViewModel-View-Event-PropertyChanged-Event.html)
+
 ## 建立新專案
 
 * 開啟 Visual Studio 2022 開發工具
