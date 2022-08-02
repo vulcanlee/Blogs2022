@@ -262,6 +262,42 @@ namespace PrismMonkey.Services
 
 最後，將取得所有猴子集合物件，回傳到呼叫端。
 
+現在要來把這個剛剛設計好的服務，註冊到 DI / IoC Container 相依性注入容器內
+
+* 在此專案的根目錄下
+* 找到並且打開 [PrismStartup.cs] 檔案
+* 找到 [RegisterTypes] 這個方法
+* 在該方法內加入 `containerRegistry.RegisterSingleton<MonkeyService>();` 敘述
+
+  > 在此是透過 containerRegistry 這個物件，告知相依性注入容器要註冊 [MonkeyService] 這個服務類別
+
+* 底下是完成後的 [PrismStartup.cs] 程式碼內容
+
+```csharp
+using PrismMonkey.Services;
+using PrismMonkey.Views;
+
+namespace PrismMonkey;
+
+internal static class PrismStartup
+{
+    public static void Configure(PrismAppBuilder builder)
+    {
+        builder.RegisterTypes(RegisterTypes)
+                .OnAppStart("NavigationPage/MainPage");
+    }
+
+    private static void RegisterTypes(IContainerRegistry containerRegistry)
+    {
+        containerRegistry.RegisterForNavigation<MainPage>()
+                     .RegisterInstance(SemanticScreenReader.Default);
+
+        // 註冊 猴子服務
+        containerRegistry.RegisterSingleton<MonkeyService>();
+    }
+}
+```
+
 ## 建立 支援 Helper 類別
 
 最後，要來完成一個支援類別的設計，這裡將會設計一個類別，把這個專案內使用到的神奇字串，都儲存到這個類別內，方便管理與讓程式碼更加好維護。
