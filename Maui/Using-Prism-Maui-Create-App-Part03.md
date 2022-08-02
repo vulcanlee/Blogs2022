@@ -32,7 +32,7 @@
 * 在此專案的根目錄下
 * 找到並且打開 [PrismStartup.cs] 檔案
 * 找到 [RegisterTypes] 這個方法
-* 在該方法內加入 `containerRegistry.RegisterForNavigation<MonkeyListPage>();` 敘述
+* 在該方法內加入 `containerRegistry.RegisterForNavigation<MonkeyListPage, MonkeyListPageViewModel>();` 敘述
 
   > 在此是透過 containerRegistry 這個物件，告知相依性注入容器要註冊一個 [MonkeyListPage] 這個頁面，當要進行頁面導航的時候，可以透過這裡個宣告，產生並且注入到需要的類別物件內。
 
@@ -58,7 +58,7 @@ internal static class PrismStartup
                      .RegisterInstance(SemanticScreenReader.Default);
 
         // 註冊 猴子集合紀錄 頁面
-        containerRegistry.RegisterForNavigation<MonkeyListPage>();
+        containerRegistry.RegisterForNavigation<MonkeyListPage, MonkeyListPageViewModel>();
 
         // 註冊 猴子服務
         containerRegistry.RegisterSingleton<MonkeyService>();
@@ -73,7 +73,7 @@ internal static class PrismStartup
 * 找到 [Configure] 這個方法
 * 在此方法到找到 `"NavigationPage/MainPage"` ，並將其替換成為 `$"NavigationPage/{ConstantHelper.MonkeyListPage}"`
 
-  > 如此，這個 MAUI 專案啟動之後，第一個險是的頁面將會是 MonkeyListPage
+  > 如此，這個 MAUI 專案啟動之後，第一個顯示的頁面將會是 MonkeyListPage ，也就是這個 ConstantHelper.MonkeyListPage 靜態字串所指向的文字內容。
 
 * 底下是完成後的 [PrismStartup.cs] 程式碼內容
 
@@ -105,9 +105,11 @@ internal static class PrismStartup
 }
 ```
 
+在這裡的 OAppStart 方法所傳入的引數，將會是 `$"NavigationPage/{ConstantHelper.MonkeyListPage}"` 這個字串，該字串將會用來表是一個要頁面導航的 相對URL，而對於要顯示的第一個頁面名稱文字，將會使用這個 ConstantHelper.MonkeyListPage 唯讀靜態字串來代表，這樣可以提高整體程式碼的可讀性，也可以提升整體專案的可維護性。
+
 ## 進行猴子清單頁面的 ViewModel 設計
 
-因為這個專案採用了 Prism.Maui 開發框架來進行設計，並且搭配使用 PropertyChanged.Fody 套件來幫忙產生與注入資料綁定時候需要用到的屬性變更通知的程式碼，因此，首先須要完成這個 ViewModel 類別的基本程式碼架構
+因為這個專案採用了 Prism.Maui 開發框架來進行設計，並且搭配使用 PropertyChanged.Fody 套件來幫忙產生與注入資料綁定時候需要用到的屬性變更通知的程式碼，因此，首先須要完成這個 ViewModel 類別的基本程式碼架構，我也稱為這是每個 ViewModel 類別需要用到的基本樣板程式碼。
 
 * 在 [ViewModels] 資料夾下
 * 找到並且打開 [MonkeyListPageViewModel.cs] 檔案
@@ -206,12 +208,18 @@ public bool IsBusy { get; set; }
 public bool IsNotBusy => !IsBusy;
 ```
 
+接下來要來宣告這個頁面會用到的可綁定命令屬性
+
 * 找到 `#region 在此設計要進行命令物件綁定的屬性`
 * 在其 `#region ... #endregion` 區段內加入底下程式碼
 
 ```csharp
 public DelegateCommand GetMonkeysCommand { get; set; }
-```
+``` 
+
+這個 GetMonkeysCommand 屬性的型別為 DelegateCommand，其會實作 ICommand 介面，因此，可以用於頁面 View 上的 XAML Command 屬性，指派為資料綁定的成員。
+
+為了要能夠抓取遠端的所有猴子清單 JSON 資料，在此把這些相關商業邏輯都設計在一個方法內，這樣可以方便呼叫與維護
 
 * 找到 `#region 在此設計該 ViewModel 的其他商業邏輯程式碼`
 * 在其 `#region ... #endregion` 區段內加入底下程式碼
@@ -263,6 +271,8 @@ private async Task ReloadMonkey()
 }
 ```
 
+這個 ViewModel ，也就是 MonkeyListPageViewModel 這個類別，需要使用到其他更多功能，例如，可以顯示訊息的對話窗、用到抓取猴子資訊的服務物件和判斷當時裝置是否有連上網路等需求，因此，需要透過建構式注入的方式，把這些服務物件注入到這個 ViewModel 內。
+
 * 找到建構式 `public MonkeyListPageViewModel`
 * 將此建構式修改為底下程式碼
 
@@ -291,7 +301,13 @@ public MonkeyListPageViewModel(INavigationService navigationService,
 }
 ```
 
+在建構式內，除了將傳入進來的參數，指派給該類別中的相對應欄位成員，緊接著還會對於 RelayCommand 這個命令屬性作初始化，也就是要建立一個 RelayCommand 物件，並且在建立時期，傳入一個委派方法到這個物件內，如此，當這個命令被執行的時候，這裡所指定的委派方法內的程式碼也就會執行了；在這個命令屬性所綁定的委派方法，將會呼叫這個類別內的 ReloadMonkey() 方法。
+
 ## 進行猴子清單頁面的 View 設計
+
+完成了 ViewModel 的設計，接下來將要來進行 View，也就是這個頁面的設計
+
+在進行 View 設計的時候，所使用的語言為 XAML
 
 * 在 [Views] 資料夾下
 * 找到並且打開 [MonkeyListPage.xaml] 檔案
@@ -364,6 +380,8 @@ public MonkeyListPageViewModel(INavigationService navigationService,
 
 </ContentPage>
 ```
+
+這個頁面最前面首先宣告了兩個命名空間 viewmodel 與 model ，這兩個命名空間將會用於底下的編譯時間綁定之用，有了這樣功能，可以在設計時間，提早發現到許多延後到執行階段才會看到的錯誤，大幅提升整體的開發效能。
 
 ## 在 Android 平台執行專案
 
