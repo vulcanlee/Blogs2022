@@ -1,6 +1,6 @@
 # 其他集合檢視 CollectionView 下拉更新設計
 
-### 在 ViewModel 建立用於資料綁定的屬性
+## 在 ViewModel 建立用於資料綁定的屬性
 
 * 在 [ViewModels] 資料夾下
 * 找到並且打開 [MonkeyListPageViewModel.cs] 檔案
@@ -21,7 +21,7 @@ public bool IsRefreshing { get; set; }
 IsRefreshing = false;
 ```
 
-### 在 View 加入可以偵測手勢下拉更新的控制項
+## 在 View 加入可以偵測手勢下拉更新的控制項
 
 * 在 [Views] 資料夾下
 * 找到並且打開 [MonkeyListPage.xaml] 檔案
