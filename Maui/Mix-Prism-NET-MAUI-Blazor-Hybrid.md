@@ -191,3 +191,5 @@ builder.Services.AddSingleton<WeatherForecastService>();
 
 ![](../Images/net929.png)
 
+![](../Images/net929.gif)
+
