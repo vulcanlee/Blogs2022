@@ -236,3 +236,9 @@ public partial class MainPage : ContentPage
 }
 ```
 
+並且執行這個 Android 專案，得到底下的結果
+
+![](../Images/net898.png) 
+
+太好了，這樣的作法是可行的
+
