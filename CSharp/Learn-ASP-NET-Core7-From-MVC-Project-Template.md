@@ -111,126 +111,70 @@ app.Run();
 
 接下來就是要進行管道與中介軟體 Middleware 的宣告
 
-`builder.Services.AddEndpointsApiExplorer()` ： 讓 Swagger 產生關於 Minimal APIs 資訊
+使用 app.Environment.IsDevelopment() 來判斷此專案此時是否在開發模式下運行，若不是在開發模式下執行，則會加入這兩個中介軟體
 
-`builder.Services.AddSwaggerGen()` ： 提供 API 資訊與描述，可以顯示在 Swagger 頁面上
+`app.UseExceptionHandler` ： 新增例外狀況處理中介軟體
 
-接下來就是相關中介軟體 Middleware 的宣告
+`app.UseHsts()` ： 新增強制執行 HTTPS
 
-`if (app.Environment.IsDevelopment()){ ... }` ： 這裡將會使用 Environment 環境物件來查看，現在是否為開發環境下，若為真，則可以使用 Swagger 的 Web 網頁
-
-`app.UseSwagger()` ： 新增 Swagger 中介軟體
-
-`app.UseSwaggerUI()` ： 會啟用 Swagger 會使用到的靜態檔案中介軟體
+接著將會宣告
 
 `app.UseHttpsRedirection()` ： 將 HTTP 要求重新導向至 HTTPS
 
+`app.UseStaticFiles()` ： 可以取得靜態檔案內容
+
+`app.UseRouting()` ： 將路由比對新增至中介軟體管線
+
 `app.UseAuthorization()` ： 授權中介軟可授權使用者存取安全資源
 
-`app.MapControllers()` ： 對應屬性路由控制器
+`app.MapControllerRoute(...)` ： 建立單一路由
 
 `app.Run()` ： 執行應用程式並封鎖呼叫執行緒，直到主機關閉為止
 
-以上的內將會是採用 [使用控制器 (取消勾選已使用最低 API)] 模式來建立這個 Web API 專案，不過，若是在建立 Web API 專案過程中，在 [其他資訊] 視窗下方找到 [使用控制器 (取消勾選已使用最低 API)] 檢查盒，不要勾選這個選項
+可以透過上面的程式碼與 空白 和 Web API 專案來比較，其實就是加入幾行程式碼，瞬間就可以將專案宣告成為採用 MVC 框架方式來設計與執行，其實，這一切功能都包含在 Microsoft.NET.Sdk.Web 內了。
 
-![](../Images/ANC7/anc988.png)
-
-若想要觀察採用 [最小 API] 方式所建立的 Web API 專案長成甚麼樣子，請重新建立一個 Web API 專案，在 [其他資訊] 視窗下方找到 [使用控制器 (取消勾選已使用最低 API)] 檢查盒，不要勾選這個選項，這樣就會使用 [最小 API] 方式來建立 Web API 專案。
-
-底下螢幕截圖，將會是採用 [最小 API] 模式建立的 Web API 專案所有檔案內容，原則上與 空白 專案的檔案幾乎是相同的。
-
-![](../Images/ANC7/anc987.png)
-
-不過，當打開 [Program.cs] 檔案後，會看底下內容
+現在來看看在 [Controllers] 資料夾內，有 [HomeController.cs] 檔案，這個檔案內容如下：
 
 ```csharp
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
-app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
-```
-
-在此，可以比較有使用 控制器 的專案，其實就可以知道，就是把所有的程式碼(控制器、資料模型等等)，全部都寫在同一個類別檔案內。
-
-最後，在 [Controllers] 資料夾內有 [WeatherForecastController.cs] 檔案，這個檔案內容如下：
-
-```csharp
+using ASPNETCore7.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace ASPNETCore7.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class HomeController : Controller
     {
-        private static readonly string[] Summaries = new[]
-        {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+        private readonly ILogger<HomeController> _logger;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public IActionResult Index()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return View();
+        }
+
+        public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
 ```
 
-這個檔案內有個 [WeatherForecastController] 控制器類別，透過 `[ApiController]` 屬性標示，註明這是個 API 控制器
+這個控制器繼承 [Controller] 類別，而這個類別又繼承了 [ControllerBase]，也就是，如同 Web API 專案一樣，這些控制器都是繼承於 [ControllerBase] 這個類別
 
-其中這個控制器內使用到的類別 WeatherForecast ，將會定義在 [WeatherForecast.cs] 檔案內
+依據 ASP.NET Core MVC 開發框架的設計方式，將會在這個 [HomeController] 類別內設計許多 [Action] 方法，這樣就可以在網頁中使用 URL 來呼叫了。
+
+對於 [Views] & [Models] 這兩個資料夾，也是依據 MVC 開發框架的命名慣例所存在的，用來設計相關檢視頁面內容和資料模型類別。
+
+另外，因為這是 MVC 網頁設計專案，因此，將會額外增加一個 [wwwroot] 目錄，這裡將會儲存網站會用到的靜態資源檔案，例如： .js JavaScript 檔案、 .css 、圖片等檔案
 
