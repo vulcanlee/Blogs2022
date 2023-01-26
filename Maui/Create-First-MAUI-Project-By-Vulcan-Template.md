@@ -1,5 +1,7 @@
 # 使用 Vulcan.Maui.Template 專案範本來進行 MAUI for Prism 專案開發
 
+![](../Images/0MAUI/Maui9994.png)
+
 早期在進行 Xamarin.Forms 專案開發的時候，通常會搭配 Prism 這套開發框架來進行 MVVM 設計模式的程式碼開發，由於 Prism 是一個 Framework 開發框架，因此，當要第一次建立專案的時候，若採用 Xamarin.Forms 所提供的預設專案範本所建立的專案，將會需要做許多的修正，才能夠在專案內使用 Prism 開發框架所提供的功能；然而，Prism 團隊也提供了一個 Prism Template Pack 擴充工具，可以安裝在 Visual Studio IDE 內，一旦想要進行 Xamarin.Forms 專案開發的時候，便可以透過 Prism Template Pack 所提供的專案範本來進行專案開發。
 
 隨著 MAUI 開發工具的到來，Prism Template Pack 並沒有隨之提供最新版本的 MAUI 支援，想要在 MAUI 專案內使用 Prism 所提供的功能，需要安裝 [Prism.Maui](https://github.com/PrismLibrary/Prism.Maui) 這個套件，當然，同樣的也需要將使用原生 MAUI 專案範本所建立的專案，進行調整。
@@ -46,12 +48,12 @@ C:\>dotnet new uninstall Vulcan.Maui.Template
   * 切換 [所有專案類型 (T)] 下拉選單控制項為 [MAUI]
 * 在中間的專案範本清單中，找到並且點選 [Vulcan Custom Prism .NET MAUI App] 專案範本選項
 
-  ![Visual Studio 2022 建立新專案](../Images/net876.png)
+  ![Visual Studio 2022 建立新專案](../Images/0MAUI/Maui9993.png)
 
 * 點選右下角的 [下一步] 按鈕
 * 在 [設定新的專案] 對話窗
 
-  ![Visual Studio 2022 設定新的專案](../Images/net875.png)
+  ![Visual Studio 2022 設定新的專案](../Images/0MAUI/Maui9992.png)
 * 請點選右下角的 [建立] 按鈕
 * 此時，將會建立一個可以用於 MAUI 開發的專案
 
@@ -59,7 +61,7 @@ C:\>dotnet new uninstall Vulcan.Maui.Template
 
 * 底下是建立好的專案結構螢幕截圖
 
-  ![](../Images/net874.png)
+  ![](../Images/0MAUI/Maui9991.png)
 * 在此專案內，已經預先建立好 [Views] 與 [ViewModels] 這兩個資料夾
 * 底下將會是 [MauiProgram.cs] 的檔案內容
 
@@ -215,10 +217,8 @@ public partial class MainPageViewModel : ObservableObject, INavigatedAware
 
 * 切換到 [Windows Machine] 模式，開始執行此專案，將會看到底下結果
 
-  ![](../Images/net873.png)
+  ![](../Images/0MAUI/Maui9990.png)
 
 * 切換到 [Android Emulator] 模式，選擇一個適合的模擬器，開始執行此專案，將會看到底下結果
 
-  ![](../Images/net872.png)
-
-
+  ![](../Images/0MAUI/Maui9989.png)
