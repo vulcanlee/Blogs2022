@@ -50,219 +50,47 @@ container.RegisterForNavigation<SplashPage, SplashPageViewModel>();
 container.RegisterForNavigation<HomePage, HomePageViewModel>();
 ```
 
+## 修正此專案啟動之後，要先顯示 SplashPage 頁面
 
+* 原先此 App 啟動之後，將會顯示 [MainPage] 頁面，該頁面在此專案將會設計為讓使用者可以輸入帳號與密碼之用
+* 因此，需要將此 App 啟動之後，先顯示此次要建立的 [SplashPage] 頁面，並且在此頁面中設計一段商業邏輯程式碼，判斷 JWT 資訊是否存在，決定接下來要導航到哪個頁面內。
+* 找到 `NavigateAsync("NavigationPage/MainPage")` 程式碼
+* 修正此程式碼為 `NavigateAsync("/SplashPage")`
 
+  >這表示此 App 啟動之後，第一個要顯示的頁面是具有導航工具列的 [SplashPage] 頁面
 
+## 設計 SplashPageViewModel 程式碼
 
-
-
-
-
-
-
-
-
-
-
-* 在此將不會另外建立一個新的專案
-* 打開剛剛實作練習完成的專案
-* 在專案內，打開 [ViewModels] > [MainPageViewModel.cs] 檔案
-* 找到 `string message = string.Empty;` 敘述，在其下方加入宣告一個型別為 LoginResponseDto 欄位，修正後的程式碼如下
-
-```csharp
-LoginResponseDto responseDto = new LoginResponseDto();
-```
-
-* 這個 responseDto 物件，將會持有呼叫 RESTful Web API 成功後的結果值
-
-## 加入可以讀取 LoginResponseDto 物件的方法
-
-* 找到 [async Task GetLoginTokenAsync()] 方法，在這個方法之後，加入一個類別要用到的非同步方法成員，程式碼如下
-
-```csharp
-async Task<bool> ReadLoginResponseAsync()
-{
-    string filename = Path.Combine(FileSystem.Current.AppDataDirectory,
-        "LoginResponse.dat");
-    try
-    {
-        string responseDtoContext = await File.ReadAllTextAsync(filename);
-        responseDto = JsonConvert.DeserializeObject<LoginResponseDto>(responseDtoContext);
-        return true;
-    }
-    catch (Exception ex)
-    {
-        responseDto = new LoginResponseDto();
-        return false;
-    }
-}
-```
-
-* 這個讀取方法首先要建立該檔案的絕對路徑，這裡透過 [FileSystem.Current.AppDataDirectory] 取得該應用程式在行動裝置內儲存檔案的絕對路徑
-* 接著透過 [Path.Combine] 方法，將這個路徑與要寫入的檔案名稱組合成為一個絕對檔案路徑字串
-* 透過 .NET BCL 提供的 [File.ReadAllTextAsync] API，將這個檔案所有文字內容讀取出來，儲存在 [responseDtoContext] 區域變數內。
-* 此時，要將剛剛讀取出來的文字，也就是一個 JSON 物件內容，反序列化成為 .NET 物件，這裡使用到 [JsonConvert.DeserializeObject<LoginResponseDto>] 這個強型別反序列方法來做到
-* 反序列化的物件將會儲存到 [responseDto] 這個類別欄位成員內
-* 若整個過程沒有發生例外異常，則會回傳 true，否則會回傳 false
-
-## 加入可以寫入 LoginResponseDto 物件的方法
-
-* 找到剛剛完成的 [ReadLoginResponseAsync()] 方法，在這個方法之後，加入一個類別要用到的非同步方法成員，程式碼如下
-
-```csharp
-async Task<bool> WriteLoginResponseAsync()
-{
-    string filename = Path.Combine(FileSystem.Current.AppDataDirectory,
-        "LoginResponse.dat");
-    try
-    {
-        string responseDtoContext = JsonConvert.SerializeObject(responseDto);
-        await File.WriteAllTextAsync(filename, responseDtoContext);
-        return true;
-    }
-    catch (Exception ex)
-    {
-        return false;
-    }
-}
-```
-
-* 在這個方法 [WriteLoginResponseAsync] 內，同樣的要先產生要寫入檔案的路徑內容
-* 這裡透過 [FileSystem.Current.AppDataDirectory] 取得該應用程式在行動裝置內儲存檔案的絕對路徑
-* 接著透過 [Path.Combine] 方法，將這個路徑與要寫入的檔案名稱組合成為一個絕對檔案路徑字串
-* 接下來要將準備寫入檔案的 [responseDto] .NET 物件，序列化成為 JSON 物件，也就是一串文字內容
-* 這裡透過 [JsonConvert.SerializeObject] API ，傳入 [responseDto] 物件，便會得到 JSON 文字內容，這個 JSON 物件將會暫時存放於 [responseDtoContext] 區域變數內
-* 透過 .NET BCL 提供的 [File.WriteAllTextAsync] API，將檔案名稱與 JSON 物件傳入到這個 API 內，如此，將會把所有文字內容寫入到指定檔案內。
-* 若整個過程沒有發生例外異常，則會回傳 true，否則會回傳 false
-
-## 修正 Login 方法，使其可以將 JWT 存取權杖寫入到檔案內
-
-* 找到 [async Task Login()] 方法
-* 在 [responseDto = JsonConvert.DeserializeObject<LoginResponseDto>(apiResult.Payload.ToString());] 方法之後，加入底下敘述
-
-```csharp
-await WriteLoginResponseAsync();
-```
-
-* 這裡將會呼叫 [WriteLoginResponseAsync] 方法，將 [LoginResponseDto] .NET 物件，序列化成為 JSON 物件，接著寫入到指定檔案內
-
-## 加入從檔案讀取 JWT 存取權杖的命令用方法
-
-* 找到 [async Task Login()] 方法
-* 在其下方加入一個命令使用的委派方法，其程式碼如下
-
-```csharp
-[RelayCommand]
-async Task GetLoginTokenAsync()
-{
-    var success = await ReadLoginResponseAsync();
-    if(success == true)
-    {
-        Message = responseDto.Token;
-    }
-    else
-    {
-        Message = $"無法讀取出存取權杖";
-    }
-}
-```
-
-* 透過 `[RelayCommand]` 屬性的宣告，使得可以在 XAML 頁面中，使用命令綁定方式來綁定到這個 [GetLoginTokenAsync] 方法上
-* 所以當使用者在螢幕上點選了一個按鈕，而該按鈕有綁定這個命令物件，此時，這個 [GetLoginTokenAsync] 就會執行
-* 首先將會呼叫 [ReadLoginResponseAsync] 方法，從特定檔案內讀取出含有 JWT 存取權杖的 JSON 文字物件出來，接著使用 JSON 反序列化方法產生出一個 .NET 物件
-* 若該方法回傳 true ，這表示含有 JWT 存取權杖的物件已經成功還原回來，並且儲存在 [respnseDto] 欄位成員內，此時將存取權杖的文字內容指派給 [Message] 屬性，透過資料綁定的機制運作，螢幕上就會看到這個存取權杖內容了。
-* 底下將會是完整的 ViewModel 程式碼
+* 打開專案內 [ViewModels] 資料夾內找到並且打開 [SplashPageViewModel.cs] 檔案
+* 此檔案內的現在程式碼如下
 
 ```csharp
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MA47.Dtos.Models;
-using Newtonsoft.Json;
-using System.Net.Http.Json;
 
 namespace MA47.ViewModels;
 
-public partial class MainPageViewModel : ObservableObject, INavigatedAware
+public partial class SplashPageViewModel : ObservableObject, INavigatedAware
 {
-    public MainPageViewModel()
+    #region Field Member
+    private readonly INavigationService navigationService;
+    #endregion
+
+    #region Property Member
+    #endregion
+
+    #region Constructor
+    public SplashPageViewModel(INavigationService navigationService)
     {
+        this.navigationService = navigationService;
     }
+    #endregion
 
-    [ObservableProperty]
-    string title = "MA49|使用者登入：存取權杖檔案讀寫";
-    [ObservableProperty]
-    string account = string.Empty;
-    [ObservableProperty]
-    string password = string.Empty;
-    [ObservableProperty]
-    string message = string.Empty;
-    LoginResponseDto responseDto = new LoginResponseDto();
+    #region Method Member
+    #region Command Method
+    #endregion
 
-    [RelayCommand]
-    async Task Login()
-    {
-        APIResult apiResult = await UserAuthenticationAsync();
-        if (apiResult.Status == true)
-        {
-            responseDto = JsonConvert
-                .DeserializeObject<LoginResponseDto>(apiResult.Payload.ToString());
-            await WriteLoginResponseAsync();
-            Message = $"Token:{responseDto.Token}";
-        }
-        else
-        {
-            Message = $"錯誤訊息:{apiResult.Message}";
-        }
-    }
-
-    [RelayCommand]
-    async Task GetLoginTokenAsync()
-    {
-        var success = await ReadLoginResponseAsync();
-        if(success == true)
-        {
-            Message = responseDto.Token;
-        }
-        else
-        {
-            Message = $"無法讀取出存取權杖";
-        }
-    }
-
-
-    async Task<bool> ReadLoginResponseAsync()
-    {
-        string filename = Path.Combine(FileSystem.Current.AppDataDirectory,
-            "LoginResponse.dat");
-        try
-        {
-            string responseDtoContext = await File.ReadAllTextAsync(filename);
-            responseDto = JsonConvert.DeserializeObject<LoginResponseDto>(responseDtoContext);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            responseDto = new LoginResponseDto();
-            return false;
-        }
-    }
-
-    async Task<bool> WriteLoginResponseAsync()
-    {
-        string filename = Path.Combine(FileSystem.Current.AppDataDirectory,
-            "LoginResponse.dat");
-        try
-        {
-            string responseDtoContext = JsonConvert.SerializeObject(responseDto);
-            await File.WriteAllTextAsync(filename, responseDtoContext);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            return false;
-        }
-    }
-
+    #region Navigation Event
     public void OnNavigatedFrom(INavigationParameters parameters)
     {
     }
@@ -270,90 +98,276 @@ public partial class MainPageViewModel : ObservableObject, INavigatedAware
     public void OnNavigatedTo(INavigationParameters parameters)
     {
     }
+    #endregion
 
-    async Task<APIResult> UserAuthenticationAsync()
+    #region Other Method
+    #endregion
+    #endregion
+}
+```
+* 使用底下程式碼替換掉現在程式碼
+
+```csharp
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MA47.Dtos.Models;
+using Newtonsoft.Json;
+
+namespace MA47.ViewModels;
+
+// 使用 dotnet new MVVMItem --namespace MA47 --view-name Splash 產生出來
+public partial class SplashPageViewModel : ObservableObject, INavigatedAware
+{
+    #region Field Member
+    private readonly INavigationService navigationService;
+    #endregion
+
+    #region Property Member
+    [ObservableProperty]
+    string currentStatus = "請稍後，正在啟動中";
+    #endregion
+
+    #region Constructor
+    public SplashPageViewModel(INavigationService navigationService)
     {
-        APIResult apiResult = null;
-        LoginRequestDto loginRequestDto = new LoginRequestDto()
-        {
-            Account = Account,
-            Password = Password,
-        };
+        this.navigationService = navigationService;
+    }
+    #endregion
 
-        HttpClient client = new HttpClient();
-        client.BaseAddress = new Uri("https://blazortw.azurewebsites.net");
-        HttpResponseMessage httpResponse = await client.PostAsJsonAsync("/api/Login", loginRequestDto);
-        if (httpResponse.IsSuccessStatusCode)
+    #region Method Member
+    #region Command Method
+    #endregion
+
+    #region Navigation Event
+    public void OnNavigatedFrom(INavigationParameters parameters)
+    {
+    }
+
+    public async void OnNavigatedTo(INavigationParameters parameters)
+    {
+        await Task.Delay(5000);
+        var result = await CheckJWTStatusAsync();
+        if (result)
         {
-            apiResult = await httpResponse.Content.ReadFromJsonAsync<APIResult>();
-            return apiResult;
+            CurrentStatus = $"發現 JWT，切換到首頁";
+            await Task.Delay(2000);
+            await navigationService.NavigateAsync("/NavigationPage/HomePage");
         }
         else
         {
-            apiResult = await httpResponse.Content.ReadFromJsonAsync<APIResult>();
-            return apiResult;
+            CurrentStatus = $"沒有發現 JWT，準備要登入";
+            await Task.Delay(2000);
+            await navigationService.NavigateAsync("/MainPage");
         }
     }
+    #endregion
+
+    #region Other Method
+    async Task<bool> CheckJWTStatusAsync()
+    {
+        string filename = Path.Combine(FileSystem.Current.AppDataDirectory,
+            "LoginResponse.dat");
+        try
+        {
+            LoginResponseDto responseDto;
+            string responseDtoContext = await File.ReadAllTextAsync(filename);
+            responseDto = JsonConvert.DeserializeObject<LoginResponseDto>(responseDtoContext);
+            if (responseDto != null && responseDto.Token != null)
+                return true;
+            else
+                return false;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
+    #endregion
+    #endregion
 }
 ```
 
-## 加入一個讀取存取權杖的按鈕到頁面上
+* 這裡使用 `[ObservableProperty]` 宣告 `string currentStatus = "請稍後，正在啟動中"` 成為一個可用於資料綁定的字串物件
+* 新增一個非同步方法 `async Task<bool> CheckJWTStatusAsync()`，用來判斷此該 App 是否擁有一個 JWT 物件，若有，則會回傳 true，否則將會回傳 false
+* 這個方法將會來嘗試讀取 [LoginResponse.dat] 裡面內容，並且嘗試將此 JSON 物件來反序列化成為一個 .NET 物件，並且此派給 [responseDto] 變數
+* 若 responseDto.Token 有內容，表示現在這個 App 可以取得上次獲得的 JWT 物件，否則就表示此時該 App 沒有擁有任何 JWT 物件
+* 在 [OnNavigatedTo] 導航事件內，也要加入呼叫剛剛設計的 [CheckJWTStatusAsync()] 方法，依據回傳結果，來判斷要切換到哪個頁面
+* 為了要能夠看到這一連串的動作，這裡將會故意使用 [Task.Delay] 方法來延遲一段時間，並且在螢幕上顯示一段文字，表示這段程式碼現在處理到哪個段落
+* 若發現到有 JWT 存在，將會使用 `await navigationService.NavigateAsync("/NavigationPage/HomePage");` 敘述，導航到 [HomePage] 頁面，將會進入與開始用這個 App。
 
-* 在專案內，打開 [Views] > [MainPage.xaml] 檔案
-* 找到 `<Button Text="登入" Margin="0,40,0,0" Command="{Binding LoginCommand}"/>` 宣告標記
-* 在其下方加入另外一個按鈕
+  >這裡使用到的 navigationService 將會是透過相依性注入來取得的物件，這個物件將會用於頁面導航用途
+* 若沒有發現到 JWT 存在，將會使用 `await navigationService.NavigateAsync("/MainPage");` 敘述，導航到 [MainPage] 頁面，讓使用者要進行帳號與密碼的輸入，進行身分驗證工作。
 
-```xml
-<Button Text="讀取存取權杖"
-        Margin="0,40,0,0"
-        Command="{Binding GetLoginTokenCommand}"/>
-```
+## 設計 SplashPage XAML 標記
 
-* 底下將會是整個頁面的 XAML 內容
+* 打開專案內 [Views] 資料夾內找到並且打開 [SplashPage.xaml] 檔案
+* 使用底下 XMAL 宣告標記替換掉原先的內容
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             Title="{Binding Title}"
-             x:Class="MA47.Views.MainPage"
+             x:Class="MA47.Views.SplashPage"
              xmlns:viewModel="clr-namespace:MA47.ViewModels"
-             x:DataType="viewModel:MainPageViewModel">
+             x:DataType="viewModel:SplashPageViewModel"
+             BackgroundColor="LightGreen">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Margin="20">
-            <Label Text="帳號"/>
-            <Entry Text="{Binding Account}"/>
-
-            <Label Text="密碼"
-                   Margin="0,20,0,0"/>
-            <Entry Text="{Binding Password}"
-                   IsPassword="True"/>
-
-            <Label Text="{Binding Message}"
-                   Margin="0,20,0,0"
-                   FontSize="20"
-                   TextColor="Red"/>
-
-            <Button Text="登入"
-                    Margin="0,40,0,0"
-                    Command="{Binding LoginCommand}"/>
-            <Button Text="讀取存取權杖"
-                    Margin="0,40,0,0"
-                    Command="{Binding GetLoginTokenCommand}"/>
-        </VerticalStackLayout>
-    </ScrollView>
+    <Grid>
+        <Label Text="{Binding CurrentStatus}"
+               FontSize="36" FontAttributes="Bold"
+               HorizontalTextAlignment="Center" VerticalTextAlignment="Center"/>
+    </Grid>
 
 </ContentPage>
 ```
 
+* 在 ContentPage 項目內，使用 [BackgroundColor] 屬性，宣告這個頁面的背景顏色為 [LightGreen]
+* 在此頁面的 內容屬性 [Content Property] 內，使用一個 [Grid] 版面配置項目
+* 在此項目內，加入一個 [Label] 項目，宣告 [Text] 這個要顯示文字內容屬性，將會透過 `{Binding ...}` 這樣的標記延伸語法，宣告 [Text] 這個屬性，將會與 ViewModel 內的 [CurrentStatus] 屬性進行資料綁定。
+
+## 設計 HomePageViewModel 程式碼
+
+* 打開專案內 [ViewModels] 資料夾內找到並且打開 [HomePageViewModel.cs] 檔案
+* 使用底下程式碼替換掉現在的 C# 程式碼
+
+```csharp
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Newtonsoft.Json;
+using System.Xml.Linq;
+
+namespace MA47.ViewModels;
+
+// 使用 dotnet new MVVMItem --namespace MA47 --view-name Home 產生出來
+public partial class HomePageViewModel : ObservableObject, INavigatedAware
+{
+    #region Field Member
+    private readonly INavigationService navigationService;
+    #endregion
+
+    #region Property Member
+    #endregion
+
+    #region Constructor
+    public HomePageViewModel(INavigationService navigationService)
+    {
+        this.navigationService = navigationService;
+    }
+    #endregion
+
+    #region Method Member
+    #region Command Method
+    [RelayCommand]
+    async Task LogoutAsync()
+    {
+        await RemoveJwtAsync();
+        await navigationService.NavigateAsync("/MainPage");
+    }
+    #endregion
+
+    #region Navigation Event
+    public void OnNavigatedFrom(INavigationParameters parameters)
+    {
+    }
+
+    public void OnNavigatedTo(INavigationParameters parameters)
+    {
+    }
+    #endregion
+
+    #region Other Method
+    async Task RemoveJwtAsync()
+    {
+        string filename = Path.Combine(FileSystem.Current.AppDataDirectory,
+            "LoginResponse.dat");
+        try
+        {
+            File.Delete(filename);
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+    #endregion
+    #endregion
+}
+```
+
+* 在這個 ViewModel 內，將會透 `[RelayCommand]` 屬性宣告用法，宣告 `async Task LogoutAsync()` 成為一個可用於命令綁定的物件
+
+  > 這裡將會透過 Microsoft MVVM Toolkit 套件提供之原始碼自動產生功能，產生出一個 [LogoutCommand] 物件，而這個物件因為實作了 [ICommand] 介面，因此，可以用於 XAML 內的 [Command] 命令綁定屬性內，用來進行將 XAML 內的命令與 ViewModel 內的方法綁定在一起。
+* 在 [LogoutAsync()] 方法內，將會呼叫 [RemoveJwtAsync] 這個方法，從這個方法名稱可以看出，此方法將會提供將本機中儲存的 JWT 檔案內容，進行刪除掉，如此，下次重新開啟 App 之後，就會因為找不到此檔案，判斷此 App 現在沒有持有 JWT 物件。
+* 接著將會執行 `await navigationService.NavigateAsync("/MainPage");` 敘述，使用絕對導航的方式，切換到 [HomePage] 這個頁面內。
+* 這裡也新增一個 [RemoveJwtAsync()] 方法，使用 [File.Delete(filename)] API，嘗試要將存放 JWT 物件的檔案進行刪除。
+
+## 設計 HomePage XAML 標記
+
+* 打開專案內 [Views] 資料夾內找到並且打開 [HomePage.xaml] 檔案
+* 使用底下 XMAL 宣告標記替換掉原先的內容
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="MA50|判斷是否有權仗決定導航頁面"
+             x:Class="MA47.Views.HomePage"
+             xmlns:viewModel="clr-namespace:MA47.ViewModels"
+             x:DataType="viewModel:HomePageViewModel">
+
+    <Grid>
+        <Button Text="登出"
+                HorizontalOptions="Center" VerticalOptions="Center"
+                Command="{Binding LogoutCommand}"
+                />
+    </Grid>
+
+</ContentPage>
+```
+
+* 在這個 [HomePage] 頁面內，很單純的加入一個 [Button] 按鈕到頁面內
+* 該按鈕將會透過 [Command] 屬性與 ViewModel 內的 [LogoutCommand] 這個物件進行資料綁定在一起
+* 一旦使用者在螢幕上點擊此按鈕之後，將會觸發與執行 ViewModel 內的 [LogoutAsync] 方法，並且嘗試將儲存 JWT 物件的檔案刪除掉，接著，導航切換到可以輸入帳號與密碼的 [MainPage] 頁面內
+
+## 設計 MainPageViewModel 程式碼
+
+* 打開專案內 [ViewModels] 資料夾內找到並且打開 [MainPageViewModel.cs] 檔案
+* 找到 `Login()` 方法程式碼所在地方
+* 在 `Login()` 方法內找到 `Message = $"Token:{responseDto.Token}";` 敘述
+* 在這個敘述之後，加入底下程式碼
+
+```csharp
+await Task.Delay(5000);
+await navigationService.NavigateAsync("/NavigationPage/HomePage");
+```
+
+* 找到這個類別的建構式 Constuctor
+* 搜尋這個類別內有這個文字 `public MainPageViewModel()`
+* 將這個建構式程式碼，使用底下程式碼來進行替換
+
+```csharp
+private readonly INavigationService navigationService;
+public MainPageViewModel(INavigationService navigationService)
+{
+    this.navigationService = navigationService;
+}
+```
+
+* 在這個建構式內，加入一個建構式參數，其型別為 [INavigationService]的 navigationService 參數
+* 這個參數將會透過 DI 容器進行建構式注入的方式來取得
+* 最後，使用使用 `this.navigationService = navigationService;` 敘述，將這個建構式參數指派給這個 [this.navigationService] 類別欄位成員
+
 ## 執行結果
 
 * 切換到 [Android Emulator] 模式，選擇一個適合的模擬器，開始執行此專案
-* 現在將會看到螢幕上多了一個 [讀取存取權杖] 按鈕
+* 若為第一次開始執行此專案的時候，將會先看到此畫面
 
-  ![](../Images/0MAUI/Maui9979.png)
+  ![](../Images/0MAUI/Maui9974.png)
+
+* 因為沒有發現到 JWT 資訊，便會顯示此畫面
+
+  ![](../Images/0MAUI/Maui9973.png)
+
+* 接著，就會看到要使用者身分驗證的畫面
 
 * 請在 帳號 與 密碼 欄位輸入正確的使用者憑證，再點選 [登入] 按鈕，就會看到底下成功登入後取得 JWT 存取權杖的畫面
 
@@ -363,9 +377,12 @@ public partial class MainPageViewModel : ObservableObject, INavigatedAware
   >
   >密碼：123
 
-  ![](../Images/0MAUI/Maui9978.png)
+  ![](../Images/0MAUI/Maui9972.png)
 
-* 現在，可以關閉這個應用程式，接著重新執行此專案
-* 當畫面出現後， [讀取存取權杖] 按鈕，便會看到剛剛寫入的存取權杖了
+* 通過身分驗證後，就會切換到首頁頁面
+* 在首頁頁面內，點選 [登出] 按鈕
+
+  ![](../Images/0MAUI/Maui9971.png)
+
 
 
