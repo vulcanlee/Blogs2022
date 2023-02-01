@@ -4,6 +4,12 @@
 
 在進行行動應用 App 專案開發的時候，必定會須要有使用者身分驗證這樣的頁面設計需求，這包含了如何設計一個具有使用者可以輸入帳號與密碼的頁面 (View) 、 如何取得使用者輸入帳號與密碼的商業邏輯處理之檢視模型 (ViewModel)，所以，就先針對這樣的需求來進行操作。
 
+* [使用 Vulcan.Maui.Template 專案範本來進行 MAUI for Prism 專案開發](https://csharpkh.blogspot.com/2023/01/Create-First-MAUI-Project-By-Vulcan-Template.html)
+* [.NET MAUI 使用者登入 ： 使用 MVVM 設計模式進行專案開發](https://csharpkh.blogspot.com/2023/01/Maui-Login-MVVM-Toolkit-Prism.html)
+* [.NET MAUI 使用者登入：使用 HttpClient 呼叫身分認證 RESTful Web API，並且取得 JWT 存取權杖](https://csharpkh.blogspot.com/2023/01/Maui-Login-Connect-Remote-RESTful-Web-API-Authentication-JWT-Token.html)
+* [.NET MAUI 用者登入：透過呼叫 Web API 成功取得存取權杖後，進行檔案讀寫操作](https://csharpkh.blogspot.com/2023/01/MAUI-Login-Access-Token-File-Read-Write.html)
+* [.NET MAUI 使用者登入：建立起動頁面，判斷存取權仗是否存在，決定需要導航到哪個頁面](https://csharpkh.blogspot.com/2023/02/MAUI-Detect-Access-Token-Splash-Navigateion-Home.html)
+
 ## 建立採用 Prism 開發框架的 MAUI 專案
 
 * 打開 Visual Studio 2022 IDE 應用程式
