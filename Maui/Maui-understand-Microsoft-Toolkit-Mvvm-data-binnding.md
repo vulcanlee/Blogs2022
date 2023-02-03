@@ -1,5 +1,7 @@
 # 解析 .NET MAUI 中 Microsoft.Toolkit.Mvvm 的運作方式
 
+![](../Images/0MAUI/Maui9965.png)
+
 在以往進行 Xamarin.Forms 專案開發時期，通常會使用 Prism 開發框架來進行整體專案開發，這是因為 Prism 提供了相當豐富的功能來方便與簡化行動裝置應用程式的開發，然而對於 MVVM 的開發上，進行 ViewModel 類別設計過程中，並沒有使用到繼承 [BindableBase] 這個類別來施做，而是使用了 [PropertyChanged.Fody] 這個套件來進行設計。
 
 底下會是 [BindableBase] 類別的程式碼
