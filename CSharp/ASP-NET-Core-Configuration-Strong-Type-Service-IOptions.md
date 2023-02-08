@@ -1,4 +1,4 @@
-# 動手練習 ASP.NET Core7 用強行別來讀取設定練習
+# 動手練習 ASP.NET Core7 用強型別來讀取設定練習
 
 ![](../Images/ANC7/anc977.png)
 
